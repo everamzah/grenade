@@ -1,8 +1,13 @@
 local def = {
 	name = "grenade:explosion",
 	description = "Grenade Explosion (you hacker you!)",
-	radius = 6,
-	radius_damage = 6,
+	radius = 3,
+	tiles = {
+		side = "default_dirt.png",
+		top = "default_dirt.png",
+		bottom = "default_dirt.png",
+		burning = "default_dirt.png"
+	},
 }
 
 tnt.register_tnt(def)
@@ -18,9 +23,11 @@ minetest.register_craftitem("grenade:grenade", {
 		pos.y = pos.y + 1.2
 
 		local obj = minetest.add_entity(pos, "grenade:grenade")
+		obj:setvelocity({x = v.x * 4, y = v.y * 2 + 4, z = v.z * 4})
+		obj:setacceleration({x = v.x / 4, y = v.y / 2 - 4, z = v.z / 4})
 
-		obj:setvelocity({x = v.x * 4, y = v.y * 4 + 4, z = v.z * 4})
-		obj:setacceleration({x = v.x / 16, y = v.y / 16 - 16, z = v.z / 16})
+		itemstack:take_item()
+		return itemstack
 	end,
 })
 
@@ -30,14 +37,15 @@ minetest.register_entity("grenade:grenade", {
 	weight = 5,
 	textures = {"default_coal_lump.png"},
 	on_activate = function(self, staticdata)
+		self.timer = 0
 	end,
 	on_step = function(self, dtime)
-		--[[
 		local acc = self.object:getacceleration()
-		local vel = self.object:getvelocity()
+		self.object:setacceleration({x = acc.x * 2 / 4, y = acc.y, z = acc.z * 2 / 4})
 
-		self.object:setvelocity({x = vel.x, y = vel.y, z = vel.z})
-		self.object:setacceleration({x = acc.x, y = acc.y, z = acc.z})
-		--]]
+		self.timer = self.timer + dtime
+		if self.timer > 4 then
+			tnt.boom(self.object:getpos(), def)
+		end
 	end,
 })
