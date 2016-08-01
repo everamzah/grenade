@@ -35,6 +35,7 @@ minetest.register_entity("grenade:grenade", {
 	physical = true,
 	collide_with_objects = true,
 	weight = 5,
+	collisionbox = {-0.25, -0.25, -0.25, 0.25, 0.25, 0.25},
 	textures = {"default_coal_lump.png"},
 	on_activate = function(self, staticdata)
 		self.timer = 0
